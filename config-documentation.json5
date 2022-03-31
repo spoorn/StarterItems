@@ -1,0 +1,9 @@
+{
+  //List of items that should be given to a player when they first join a world.
+  //Example:
+  //	"starterItems": [
+  //		"minecraft:diamond",
+  //		"minecraft:iron_sword"
+  //	]
+  "starterItems": []
+}
