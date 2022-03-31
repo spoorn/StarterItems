@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "starteritems",
+  "version": "${version}",
+  "name": "StarterItems",
+  "description": "Gives starter items to players when they first join a world",
+  "authors": [
+    "spoorn"
+  ],
+  "contact": {
+    "website": ""
+  },
+  "license": "LGPL-3.0",
+  "icon": "assets/starteritems/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "org.spoorn.starteritems.client.StarterItemsClient"
+    ],
+    "main": [
+      "org.spoorn.starteritems.StarterItems"
+    ]
+  },
+  "mixins": [
+    "starteritems.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.13.3",
+    "fabric": "*",
+    "minecraft": "1.18.2"
+  }
+}
