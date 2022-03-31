@@ -12,7 +12,7 @@ public class ModConfig implements Config {
     
     private static ModConfig CONFIG;
     
-    @Comment("List of items that should be given to a player when they first join a world.\n" +
+    @Comment("List of items that should be given to a player when they first join a world.  This should be the full item Identifier.\n" +
             "Example:\n" +
             "\t\"starterItems\": [\n" +
             "\t\t\"minecraft:diamond\",\n" +
