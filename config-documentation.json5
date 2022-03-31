@@ -5,9 +5,14 @@
   //Example:
   //	"starterItems": [
   //		"minecraft:diamond",
-  //		"minecraft:iron_sword"
+  //		"minecraft:iron_sword",
   //		"5 minecraft:apple",
   //		"20 minecraft:bread"
   //	]
-  "starterItems": []
+  "starterItems": [
+    "minecraft:diamond",
+    "minecraft:iron_sword",
+    "5 minecraft:apple",
+    "20 minecraft:bread"
+  ]
 }

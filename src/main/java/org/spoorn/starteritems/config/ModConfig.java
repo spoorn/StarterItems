@@ -17,7 +17,7 @@ public class ModConfig implements Config {
             "\nExample:\n" +
             "\t\"starterItems\": [\n" +
             "\t\t\"minecraft:diamond\",\n" +
-            "\t\t\"minecraft:iron_sword\"\n" +
+            "\t\t\"minecraft:iron_sword\",\n" +
             "\t\t\"5 minecraft:apple\",\n" +
             "\t\t\"20 minecraft:bread\"\n" +
             "\t]")
