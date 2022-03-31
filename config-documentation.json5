@@ -9,10 +9,5 @@
   //		"5 minecraft:apple",
   //		"20 minecraft:bread"
   //	]
-  "starterItems": [
-    "minecraft:diamond",
-    "minecraft:iron_sword",
-    "5 minecraft:apple",
-    "20 minecraft:bread"
-  ]
+  "starterItems": []
 }
