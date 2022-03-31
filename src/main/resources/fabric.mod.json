@@ -3,7 +3,7 @@
   "id": "starteritems",
   "version": "${version}",
   "name": "StarterItems",
-  "description": "Gives starter items to players when they first join a world",
+  "description": "Configurable starter items to give players when they first join a world",
   "authors": [
     "spoorn"
   ],
