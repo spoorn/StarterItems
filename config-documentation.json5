@@ -1,4 +1,11 @@
 {
+  //Set to true to clear the player's inventory before adding starter items listed in this config file. [default = false]
+  //This is useful for cases where mods in a modpack may actually add their own items to a player's inventory when
+  //	they first join a world.  Setting this to true will attempt to load StarterItems's logic AFTER other mods, and
+  //	clear the inventory before.  There is a chance that other mods try to do the same, in which case, if you notice
+  //	the player's inventory is not actually cleared before adding starterItems, please submit an issue to
+  //	https://github.com/spoorn/StarterItems/issues, and I can add compatibility.
+  "clearInventoryBeforeGivingItems": false,
   //List of items that should be given to a player when they first join a world.  This should be the full item Identifier.
   //The item identifier can be prefixed with the count for that item to give to the player.
   //
@@ -9,5 +16,10 @@
   //		"5 minecraft:apple",
   //		"20 minecraft:bread"
   //	]
-  "starterItems": []
+  "starterItems": [
+    "minecraft:diamond",
+    "minecraft:iron_sword",
+    "5 minecraft:apple",
+    "20 minecraft:bread"
+  ]
 }

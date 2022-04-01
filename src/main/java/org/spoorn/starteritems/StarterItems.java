@@ -2,6 +2,7 @@ package org.spoorn.starteritems;
 
 import lombok.extern.log4j.Log4j2;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -60,7 +61,7 @@ public class StarterItems implements ModInitializer {
         if (!starterItemStacks.isEmpty()) {
             log.info("StarterItems={} loaded", starterItemStacks);
             
-            ServerEntityEvents.ENTITY_LOAD.register(((entity, world) -> {
+            ServerEntityEvents.Load loadLambda = ((entity, world) -> {
                 if (entity instanceof ServerPlayerEntity player) {
                     Set<String> scoreboardTags = player.getScoreboardTags();
                     if (!scoreboardTags.contains(JOINED_ID)) {
@@ -70,6 +71,10 @@ public class StarterItems implements ModInitializer {
                             throw new RuntimeException("Player " + player + " scoreboard tags are full!  Might need to find a different way to track player joined worlds");
                         }
 
+                        if (ModConfig.get().clearInventoryBeforeGivingItems) {
+                            player.getInventory().clear();
+                        }
+                        
                         for (ItemStack itemStack : starterItemStacks) {
                             boolean insertedItem = player.getInventory().insertStack(itemStack);
                             if (!insertedItem) {
@@ -79,7 +84,16 @@ public class StarterItems implements ModInitializer {
                         }
                     }
                 }
-            }));
+            });
+            
+            if (ModConfig.get().clearInventoryBeforeGivingItems) {
+                Identifier postDefaultPhase = new Identifier(MODID, "postdefault");
+                ServerEntityEvents.ENTITY_LOAD.addPhaseOrdering(Event.DEFAULT_PHASE, postDefaultPhase);
+                log.info("[StarterItems] Clearing player inventory before giving starter items.");
+                ServerEntityEvents.ENTITY_LOAD.register(postDefaultPhase, loadLambda);
+            } else {
+                ServerEntityEvents.ENTITY_LOAD.register(loadLambda);
+            }
         }
     }
 }
