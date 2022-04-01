@@ -1,11 +1,14 @@
 package org.spoorn.starteritems;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lombok.extern.log4j.Log4j2;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
@@ -22,7 +25,7 @@ public class StarterItems implements ModInitializer {
     
     public static final String MODID = "starteritems";
     private static final String JOINED_ID = MODID + "_joined";
-    private static final Pattern ITEM_REGEX = Pattern.compile("^((?<count>\\d+)\\s+)?\\s*(?<item>[\\w:]+)$");
+    private static final Pattern ITEM_REGEX = Pattern.compile("^((?<count>\\d+)\\s+)?\\s*(?<item>[\\w:]+)\\s*(\\s+(?<nbt>\\{.*\\}))?$");
     
     @Override
     public void onInitialize() {
@@ -43,7 +46,8 @@ public class StarterItems implements ModInitializer {
             }
             
             String countStr = matcher.group("count");
-            String itemStr = matcher.group("item");
+            String itemStr = matcher.group("item").trim();
+            String nbtStr = matcher.group("nbt");
 
             Identifier identifier = new Identifier(itemStr);
             if (!Registry.ITEM.containsId(identifier)) {
@@ -52,9 +56,18 @@ public class StarterItems implements ModInitializer {
             }
             
             Item item = Registry.ITEM.get(identifier);
-            int count = countStr == null ? 1 : Integer.parseInt(countStr);
+            int count = countStr == null ? 1 : Integer.parseInt(countStr.trim());
             
-            starterItemStacks.add(new ItemStack(item, count));
+            ItemStack itemStack = new ItemStack(item, count);
+            if (nbtStr != null) {
+                try {
+                    NbtCompound nbtCompound = StringNbtReader.parse(nbtStr);
+                    itemStack.setNbt(nbtCompound);
+                } catch (CommandSyntaxException e) {
+                    throw new RuntimeException("[StarterItems] Could not read Nbt compound from \"" + starterItem + "\"");
+                }
+            }
+            starterItemStacks.add(itemStack);
         }
         
         // On player log in, give starter items

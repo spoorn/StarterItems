@@ -22,10 +22,11 @@ public class ModConfig implements Config {
     
     @Comment("List of items that should be given to a player when they first join a world.  This should be the full item Identifier.\n" +
             "The item identifier can be prefixed with the count for that item to give to the player.\n" +
+            "The item identifier can be followed by NBT data for the item stack.  See below for an example NBT data on an iron_sword.\n" +
             "\nExample:\n" +
             "\t\"starterItems\": [\n" +
             "\t\t\"minecraft:diamond\",\n" +
-            "\t\t\"minecraft:iron_sword\",\n" +
+            "\t\t\"minecraft:iron_sword {Damage:10}\",\n" +
             "\t\t\"5 minecraft:apple\",\n" +
             "\t\t\"20 minecraft:bread\"\n" +
             "\t]")
