@@ -36,7 +36,7 @@ public class StarterItems implements ModInitializer {
         
         // Validate and cache starter items
         List<String> starterItems = ModConfig.get().starterItems;
-        List<ItemStack> starterItemStacks = new ArrayList<>();
+        final List<ItemStack> starterItemStacks = new ArrayList<>();
         for (String starterItem : starterItems) {
             Matcher matcher = ITEM_REGEX.matcher(starterItem.trim());
             
@@ -88,7 +88,9 @@ public class StarterItems implements ModInitializer {
                             player.getInventory().clear();
                         }
                         
-                        for (ItemStack itemStack : starterItemStacks) {
+                        // Copy as inserting stacks mutates it
+                        List<ItemStack> starterItemStacksCopy = copyItemStacks(starterItemStacks);
+                        for (ItemStack itemStack : starterItemStacksCopy) {
                             boolean insertedItem = player.getInventory().insertStack(itemStack);
                             if (!insertedItem) {
                                 log.error("[StarterItems] Player={} inventory is full!  Cannot add anymore starter items at={} and after", player, itemStack);
@@ -108,5 +110,13 @@ public class StarterItems implements ModInitializer {
                 ServerEntityEvents.ENTITY_LOAD.register(loadLambda);
             }
         }
+    }
+    
+    private List<ItemStack> copyItemStacks(List<ItemStack> stacks) {
+        List<ItemStack> res = new ArrayList<>();
+        for (ItemStack stack : stacks) {
+            res.add(stack.copy());
+        }
+        return res;
     }
 }
