@@ -1,10 +1,14 @@
 package org.spoorn.starteritems;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import lombok.AllArgsConstructor;
+import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -14,9 +18,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.spoorn.starteritems.config.ModConfig;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,49 +42,67 @@ public class StarterItems implements ModInitializer {
         
         // Validate and cache starter items
         List<String> starterItems = ModConfig.get().starterItems;
-        final List<ItemStack> starterItemStacks = new ArrayList<>();
+        List<ItemInfo> itemInfos = new ArrayList<>();
         for (String starterItem : starterItems) {
             Matcher matcher = ITEM_REGEX.matcher(starterItem.trim());
-            
+
             if (!matcher.matches()) {
                 throw new RuntimeException("Starter Item {" + starterItem + "} is not in a valid format.  " +
                         "Please check the config file at config/starteritems.json5 for acceptable formats.");
             }
-            
+
             String countStr = matcher.group("count");
             String itemStr = matcher.group("item").trim();
             String nbtStr = matcher.group("nbt");
 
             Identifier identifier = new Identifier(itemStr);
-            if (!Registry.ITEM.containsId(identifier)) {
-                throw new RuntimeException("Starter Item {" + itemStr + "} does not exist in the Item registry.  " +
-                        "Are you sure the identifier is correct?");
-            }
-            
-            Item item = Registry.ITEM.get(identifier);
-            int count = countStr == null ? 1 : Integer.parseInt(countStr.trim());
-            
-            ItemStack itemStack = new ItemStack(item, count);
+
+            NbtCompound nbtCompound = null;
             if (nbtStr != null) {
                 try {
-                    NbtCompound nbtCompound = StringNbtReader.parse(nbtStr);
-                    itemStack.setNbt(nbtCompound);
+                    nbtCompound = StringNbtReader.parse(nbtStr);
                 } catch (CommandSyntaxException e) {
                     throw new RuntimeException("[StarterItems] Could not read Nbt compound from \"" + starterItem + "\"");
                 }
             }
-            starterItemStacks.add(itemStack);
+            
+            itemInfos.add(new ItemInfo(countStr, identifier, nbtCompound));
         }
         
         // On player log in, give starter items
-        if (!starterItemStacks.isEmpty()) {
-            log.info("StarterItems={} loaded", starterItemStacks);
-            
+        if (!itemInfos.isEmpty()) {
+            log.info("StarterItems={} loaded", itemInfos);
+
+
+            List<ItemStack> starterItemStacks = new ArrayList<>();
+            AtomicBoolean parsedItems = new AtomicBoolean(false);
+
             ServerEntityEvents.Load loadLambda = ((entity, world) -> {
                 if (entity instanceof ServerPlayerEntity player) {
                     Set<String> scoreboardTags = player.getScoreboardTags();
                     if (!scoreboardTags.contains(JOINED_ID)) {
                         log.info("Player={} is joining the world for the first time.  Giving them starter items...", player);
+                        
+                        if (!parsedItems.get()) {
+                            for (ItemInfo itemInfo : itemInfos) {
+                                Identifier identifier = itemInfo.itemId;
+
+                                if (!Registry.ITEM.containsId(identifier)) {
+                                    throw new RuntimeException("Starter Item {" + identifier + "} does not exist in the Item registry.  " +
+                                            "Are you sure the identifier is correct?");
+                                }
+
+                                Item item = Registry.ITEM.get(identifier);
+                                int count = itemInfo.countStr == null ? 1 : Integer.parseInt(itemInfo.countStr.trim());
+
+                                ItemStack itemStack = new ItemStack(item, count);
+                                if (itemInfo.nbt != null) {
+                                    itemStack.setNbt(itemInfo.nbt);
+                                }
+                                starterItemStacks.add(itemStack);
+                            }
+                            parsedItems.set(true);
+                        }
 
                         if (!player.addScoreboardTag(JOINED_ID)) {
                             throw new RuntimeException("Player " + player + " scoreboard tags are full!  Might need to find a different way to track player joined worlds");
@@ -118,5 +142,13 @@ public class StarterItems implements ModInitializer {
             res.add(stack.copy());
         }
         return res;
+    }
+    
+    @AllArgsConstructor
+    @ToString
+    private static class ItemInfo {
+        @Nullable String countStr;
+        Identifier itemId;
+        @Nullable NbtCompound nbt;
     }
 }
