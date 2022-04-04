@@ -25,6 +25,7 @@ import org.spoorn.starteritems.config.ModConfig;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,8 +36,12 @@ import java.util.regex.Pattern;
 public class StarterItems implements ModInitializer {
     
     public static final String MODID = "starteritems";
-    private static final String JOINED_ID = MODID + "_joined";
+    public static final String JOINED_ID = MODID + "_joined";
     private static final Pattern ITEM_REGEX = Pattern.compile("^((?<count>\\d+)\\s+)?\\s*(?<item>[\\w:]+)\\s*(\\s+(?<nbt>\\{.*\\}))?$");
+    
+    // Keep track of players that have been loaded.  This is to avoid sending the welcome message when player reloads
+    // as in changing dimensions.
+    public static final Set<String> LOADED_PLAYERS = new HashSet<>();
     
     @Override
     public void onInitialize() {
@@ -90,8 +95,9 @@ public class StarterItems implements ModInitializer {
                 if (entity instanceof ServerPlayerEntity player) {
                     Set<String> scoreboardTags = player.getScoreboardTags();
                     if (scoreboardTags.contains(JOINED_ID)) {
-                        // Welcome messages
-                        if (!welcomeMessages.isEmpty()) {
+                        // Only send the welcome message if this is the first time player is loading in
+                        if (!welcomeMessages.isEmpty() && !LOADED_PLAYERS.contains(player.getGameProfile().getId().toString())) {
+                            // Welcome messages
                             log.info("Sending welcome messages to {}", player);
                             sendMessagesToPlayer(player, welcomeMessages);
                         }
@@ -146,6 +152,9 @@ public class StarterItems implements ModInitializer {
                             }
                         }
                     }
+                    
+                    // Keep track of loaded players
+                    LOADED_PLAYERS.add(player.getGameProfile().getId().toString());
                 }
             });
             
@@ -165,6 +174,15 @@ public class StarterItems implements ModInitializer {
             res.add(stack.copy());
         }
         return res;
+    }
+
+    private void sendMessagesToPlayer(ServerPlayerEntity player, List<Text> firstJoinMessages) {
+        if (player != null && !firstJoinMessages.isEmpty()) {
+            log.info("Sending first join message to player {}", player);
+            for (Text message : firstJoinMessages) {
+                player.getServer().getPlayerManager().broadcast(message, MessageType.CHAT, Util.NIL_UUID);
+            }
+        }
     }
     
     private List<Text> parseMessages(List<Message> messages) {
@@ -192,15 +210,6 @@ public class StarterItems implements ModInitializer {
             res.add(text);
         }
         return res;
-    }
-    
-    private void sendMessagesToPlayer(ServerPlayerEntity player, List<Text> firstJoinMessages) {
-        if (player != null && !firstJoinMessages.isEmpty()) {
-            log.info("Sending first join message to player {}", player);
-            for (Text message : firstJoinMessages) {
-                player.getServer().getPlayerManager().broadcast(message, MessageType.CHAT, Util.NIL_UUID);
-            }
-        }
     }
     
     @AllArgsConstructor
