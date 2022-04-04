@@ -56,6 +56,13 @@ public class ModConfig implements Config {
             new Message("Welcome to the Oasis!", "#47f5af"),
             new Message("Ready Player One?", "16074611")
     );
+
+    @Comment("List of messages to send to players every time they join the world, except for the first time.  If you want\n" +
+            "to send messages to players for the first time they join the world, set messages in firstJoinMessages.\n" +
+            "The schema for this list is the same in firstJoinMessages.  See the documentation above for details and examples.")
+    public List<Message> welcomeMessages = Arrays.asList(
+            new Message("Welcome back to the Oasis!", "#47f5af")
+    );
     
     public static void init() {
         CONFIG = OmegaConfig.register(ModConfig.class);

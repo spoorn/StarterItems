@@ -76,7 +76,10 @@ public class StarterItems implements ModInitializer {
         }
         
         // Parse First Join Messages
-        List<Text> firstJoinMessages = parseFirstJoinMessages(ModConfig.get().firstJoinMessages);
+        List<Text> firstJoinMessages = parseMessages(ModConfig.get().firstJoinMessages);
+        
+        // Parse Welcome Messages
+        List<Text> welcomeMessages = parseMessages(ModConfig.get().welcomeMessages);
         
         // On player log in, give starter items
         if (!itemInfos.isEmpty() || !firstJoinMessages.isEmpty()) {
@@ -86,7 +89,13 @@ public class StarterItems implements ModInitializer {
             ServerEntityEvents.Load loadLambda = ((entity, world) -> {
                 if (entity instanceof ServerPlayerEntity player) {
                     Set<String> scoreboardTags = player.getScoreboardTags();
-                    if (!scoreboardTags.contains(JOINED_ID)) {
+                    if (scoreboardTags.contains(JOINED_ID)) {
+                        // Welcome messages
+                        if (!welcomeMessages.isEmpty()) {
+                            log.info("Sending welcome messages to {}", player);
+                            sendMessagesToPlayer(player, welcomeMessages);
+                        }
+                    } else {
                         log.info("Player={} is joining the world for the first time.  Processing Starter stuff", player);
                         
                         // Parse starter items
@@ -158,7 +167,7 @@ public class StarterItems implements ModInitializer {
         return res;
     }
     
-    private List<Text> parseFirstJoinMessages(List<Message> messages) {
+    private List<Text> parseMessages(List<Message> messages) {
         Pattern colorPattern = Pattern.compile("^(#[0-9a-fA-F]{6})|(\\d+$)");
         List<Text> res = new ArrayList<>();
         for (Message s : messages) {

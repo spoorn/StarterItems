@@ -17,5 +17,49 @@
   //		"5 minecraft:apple",
   //		"20 minecraft:bread"
   //	]
-  "starterItems": []
+  "starterItems": [
+    "minecraft:diamond",
+    "minecraft:iron_sword {Damage:10}",
+    "5 minecraft:apple",
+    "20 minecraft:bread"
+  ],
+  //List of messages to send to players when they join a world for the first time.  Each string in the array will be
+  //a separate message sent to the player.
+  //This is a list of Message objects which contain a required 'text' string field, and optional formatting fields such as color.
+  //
+  //Message Specification:
+  //	{		"text": "Message Text",
+  //		(optional) "color": "<#Hex Color>|<RGB Decimal>"
+  //	}
+  //
+  //Example:
+  //	[
+  //		{
+  //			"text": "Welcome to the Oasis!",
+  //			"color": "#47f5af"
+  //		}
+  //		{
+  //			"text": "Ready Player One?",
+  //			"color": "16074611"
+  //		}
+  //	]
+  "firstJoinMessages": [
+    {
+      "text": "Welcome to the Oasis!",
+      "color": "#47f5af"
+    },
+    {
+      "text": "Ready Player One?",
+      "color": "16074611"
+    }
+  ],
+  //List of messages to send to players every time they join the world, except for the first time.  If you want
+  //to send messages to players for the first time they join the world, set messages in firstJoinMessages.
+  //The schema for this list is the same in firstJoinMessages.  See the documentation above for details and examples.
+  "welcomeMessages": [
+    {
+      "text": "Welcome back to the Oasis!",
+      "color": "#47f5af"
+    }
+  ]
 }
