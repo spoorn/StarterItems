@@ -42,7 +42,7 @@ public class ModConfig implements Config {
             "\t\t(optional) \"color\": \"<#Hex Color>|<RGB Decimal>\"\n" +
             "\t}" +
             "\n\nExample:\n" +
-            "\t[\n" +
+            "\t\"firstJoinMessages\": [\n" +
             "\t\t{\n" +
             "\t\t\t\"text\": \"Welcome to the Oasis!\",\n" +
             "\t\t\t\"color\": \"#47f5af\"\n" +

@@ -34,7 +34,7 @@
   //	}
   //
   //Example:
-  //	[
+  //	"firstJoinMessages": [
   //		{
   //			"text": "Welcome to the Oasis!",
   //			"color": "#47f5af"
