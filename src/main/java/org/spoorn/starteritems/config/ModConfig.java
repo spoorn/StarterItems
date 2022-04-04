@@ -37,7 +37,7 @@ public class ModConfig implements Config {
             "a separate message sent to the player.\n" +
             "This is a list of Message objects which contain a required 'text' string field, and optional formatting fields such as color.\n" +
             "\nMessage Specification:\n" +
-            "\t{" +
+            "\t{\n" +
             "\t\t\"text\": \"Message Text\",\n" +
             "\t\t(optional) \"color\": \"<#Hex Color>|<RGB Decimal>\"\n" +
             "\t}" +
@@ -46,7 +46,7 @@ public class ModConfig implements Config {
             "\t\t{\n" +
             "\t\t\t\"text\": \"Welcome to the Oasis!\",\n" +
             "\t\t\t\"color\": \"#47f5af\"\n" +
-            "\t\t}\n" +
+            "\t\t},\n" +
             "\t\t{\n" +
             "\t\t\t\"text\": \"Ready Player One?\",\n" +
             "\t\t\t\"color\": \"16074611\"\n" +

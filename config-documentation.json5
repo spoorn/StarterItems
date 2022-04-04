@@ -28,7 +28,8 @@
   //This is a list of Message objects which contain a required 'text' string field, and optional formatting fields such as color.
   //
   //Message Specification:
-  //	{		"text": "Message Text",
+  //	{
+  //		"text": "Message Text",
   //		(optional) "color": "<#Hex Color>|<RGB Decimal>"
   //	}
   //
@@ -37,7 +38,7 @@
   //		{
   //			"text": "Welcome to the Oasis!",
   //			"color": "#47f5af"
-  //		}
+  //		},
   //		{
   //			"text": "Ready Player One?",
   //			"color": "16074611"
