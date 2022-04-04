@@ -6,6 +6,7 @@ import draylar.omegaconfig.api.Config;
 import org.spoorn.starteritems.StarterItems;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ModConfig implements Config {
@@ -31,6 +32,30 @@ public class ModConfig implements Config {
             "\t\t\"20 minecraft:bread\"\n" +
             "\t]")
     public List<String> starterItems = new ArrayList<>();
+    
+    @Comment("List of messages to send to players when they join a world for the first time.  Each string in the array will be\n" +
+            "a separate message sent to the player.\n" +
+            "This is a list of Message objects which contain a required 'text' string field, and optional formatting fields such as color.\n" +
+            "\nMessage Specification:\n" +
+            "\t{" +
+            "\t\t\"text\": \"Message Text\",\n" +
+            "\t\t(optional) \"color\": \"<#Hex Color>|<RGB Decimal>\"\n" +
+            "\t}" +
+            "\n\nExample:\n" +
+            "\t[\n" +
+            "\t\t{\n" +
+            "\t\t\t\"text\": \"Welcome to the Oasis!\",\n" +
+            "\t\t\t\"color\": \"#47f5af\"\n" +
+            "\t\t}\n" +
+            "\t\t{\n" +
+            "\t\t\t\"text\": \"Ready Player One?\",\n" +
+            "\t\t\t\"color\": \"16074611\"\n" +
+            "\t\t}\n" +
+            "\t]")
+    public List<Message> firstJoinMessages = Arrays.asList(
+            new Message("Welcome to the Oasis!", "#47f5af"),
+            new Message("Ready Player One?", "16074611")
+    );
     
     public static void init() {
         CONFIG = OmegaConfig.register(ModConfig.class);

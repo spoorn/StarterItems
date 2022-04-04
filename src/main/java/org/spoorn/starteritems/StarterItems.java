@@ -7,15 +7,20 @@ import lombok.extern.log4j.Log4j2;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.network.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.registry.Registry;
+import org.spoorn.starteritems.config.Message;
 import org.spoorn.starteritems.config.ModConfig;
 
 import javax.annotation.Nullable;
@@ -67,13 +72,14 @@ public class StarterItems implements ModInitializer {
             }
             
             itemInfos.add(new ItemInfo(countStr, identifier, nbtCompound));
+            log.info("StarterItems={} loaded", itemInfos);
         }
         
+        // Parse First Join Messages
+        List<Text> firstJoinMessages = parseFirstJoinMessages(ModConfig.get().firstJoinMessages);
+        
         // On player log in, give starter items
-        if (!itemInfos.isEmpty()) {
-            log.info("StarterItems={} loaded", itemInfos);
-
-
+        if (!itemInfos.isEmpty() || !firstJoinMessages.isEmpty()) {
             List<ItemStack> starterItemStacks = new ArrayList<>();
             AtomicBoolean parsedItems = new AtomicBoolean(false);
 
@@ -81,8 +87,9 @@ public class StarterItems implements ModInitializer {
                 if (entity instanceof ServerPlayerEntity player) {
                     Set<String> scoreboardTags = player.getScoreboardTags();
                     if (!scoreboardTags.contains(JOINED_ID)) {
-                        log.info("Player={} is joining the world for the first time.  Giving them starter items...", player);
+                        log.info("Player={} is joining the world for the first time.  Processing Starter stuff", player);
                         
+                        // Parse starter items
                         if (!parsedItems.get()) {
                             for (ItemInfo itemInfo : itemInfos) {
                                 Identifier identifier = itemInfo.itemId;
@@ -106,19 +113,27 @@ public class StarterItems implements ModInitializer {
 
                         if (!player.addScoreboardTag(JOINED_ID)) {
                             throw new RuntimeException("Player " + player + " scoreboard tags are full!  Might need to find a different way to track player joined worlds");
+                        } else {
+                            // send first join messages to player
+                            sendMessagesToPlayer(player, firstJoinMessages);
                         }
 
-                        if (ModConfig.get().clearInventoryBeforeGivingItems) {
-                            player.getInventory().clear();
-                        }
-                        
-                        // Copy as inserting stacks mutates it
-                        List<ItemStack> starterItemStacksCopy = copyItemStacks(starterItemStacks);
-                        for (ItemStack itemStack : starterItemStacksCopy) {
-                            boolean insertedItem = player.getInventory().insertStack(itemStack);
-                            if (!insertedItem) {
-                                log.error("[StarterItems] Player={} inventory is full!  Cannot add anymore starter items at={} and after", player, itemStack);
-                                break;
+                        // Starter Items
+                        if (!starterItemStacks.isEmpty()) {
+                            log.info("Giving starter items to player={}", player);
+                            if (ModConfig.get().clearInventoryBeforeGivingItems) {
+                                log.info("Clearing player inventory before giving starter items");
+                                player.getInventory().clear();
+                            }
+
+                            // Copy as inserting stacks mutates it
+                            List<ItemStack> starterItemStacksCopy = copyItemStacks(starterItemStacks);
+                            for (ItemStack itemStack : starterItemStacksCopy) {
+                                boolean insertedItem = player.getInventory().insertStack(itemStack);
+                                if (!insertedItem) {
+                                    log.error("[StarterItems] Player={} inventory is full!  Cannot add anymore starter items at={} and after", player, itemStack);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -128,7 +143,6 @@ public class StarterItems implements ModInitializer {
             if (ModConfig.get().clearInventoryBeforeGivingItems) {
                 Identifier postDefaultPhase = new Identifier(MODID, "postdefault");
                 ServerEntityEvents.ENTITY_LOAD.addPhaseOrdering(Event.DEFAULT_PHASE, postDefaultPhase);
-                log.info("[StarterItems] Clearing player inventory before giving starter items.");
                 ServerEntityEvents.ENTITY_LOAD.register(postDefaultPhase, loadLambda);
             } else {
                 ServerEntityEvents.ENTITY_LOAD.register(loadLambda);
@@ -142,6 +156,42 @@ public class StarterItems implements ModInitializer {
             res.add(stack.copy());
         }
         return res;
+    }
+    
+    private List<Text> parseFirstJoinMessages(List<Message> messages) {
+        Pattern colorPattern = Pattern.compile("^(#[0-9a-fA-F]{6})|(\\d+$)");
+        List<Text> res = new ArrayList<>();
+        for (Message s : messages) {
+            MutableText text = new LiteralText(s.text);
+            
+            String colorStr = s.color;
+            if (colorStr != null) {
+                if (!colorPattern.matcher(colorStr).matches()) {
+                    throw new RuntimeException("[StarterItems] Pattern {" + colorStr + "} is not a valid color.  Must be RGB Decimal or Hex color");
+                }
+                
+                int color;
+                if (colorStr.startsWith("#")) {
+                    color = Integer.parseInt(colorStr.substring(1), 16);
+                } else {
+                    color = Integer.parseInt(colorStr);
+                }
+
+                text = text.setStyle(Style.EMPTY.withColor(color));
+            }
+            
+            res.add(text);
+        }
+        return res;
+    }
+    
+    private void sendMessagesToPlayer(ServerPlayerEntity player, List<Text> firstJoinMessages) {
+        if (player != null && !firstJoinMessages.isEmpty()) {
+            log.info("Sending first join message to player {}", player);
+            for (Text message : firstJoinMessages) {
+                player.getServer().getPlayerManager().broadcast(message, MessageType.CHAT, Util.NIL_UUID);
+            }
+        }
     }
     
     @AllArgsConstructor
