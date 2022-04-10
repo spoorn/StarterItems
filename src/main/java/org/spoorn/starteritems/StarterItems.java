@@ -180,7 +180,7 @@ public class StarterItems implements ModInitializer {
         if (player != null && !firstJoinMessages.isEmpty()) {
             log.info("Sending first join message to player {}", player);
             for (Text message : firstJoinMessages) {
-                player.getServer().getPlayerManager().broadcast(message, MessageType.CHAT, Util.NIL_UUID);
+                player.sendMessage(message, MessageType.CHAT, Util.NIL_UUID);
             }
         }
     }
