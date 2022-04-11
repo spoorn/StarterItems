@@ -130,6 +130,7 @@ public class StarterItems implements ModInitializer {
                             throw new RuntimeException("Player " + player + " scoreboard tags are full!  Might need to find a different way to track player joined worlds");
                         } else {
                             // send first join messages to player
+                            log.info("Sending first join message to player {}", player);
                             sendMessagesToPlayer(player, firstJoinMessages);
                         }
 
@@ -178,7 +179,6 @@ public class StarterItems implements ModInitializer {
 
     private void sendMessagesToPlayer(ServerPlayerEntity player, List<Text> firstJoinMessages) {
         if (player != null && !firstJoinMessages.isEmpty()) {
-            log.info("Sending first join message to player {}", player);
             for (Text message : firstJoinMessages) {
                 player.sendMessage(message, MessageType.CHAT, Util.NIL_UUID);
             }
