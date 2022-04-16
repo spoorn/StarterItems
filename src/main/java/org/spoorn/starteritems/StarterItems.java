@@ -145,10 +145,8 @@ public class StarterItems implements ModInitializer {
                             // Copy as inserting stacks mutates it
                             List<ItemStack> starterItemStacksCopy = copyItemStacks(starterItemStacks);
                             for (ItemStack itemStack : starterItemStacksCopy) {
-                                boolean insertedItem = player.getInventory().insertStack(itemStack);
-                                if (!insertedItem) {
-                                    log.error("[StarterItems] Player={} inventory is full!  Cannot add anymore starter items at={} and after", player, itemStack);
-                                    break;
+                                if (!player.giveItemStack(itemStack)) {
+                                    player.dropStack(itemStack);
                                 }
                             }
                         }
