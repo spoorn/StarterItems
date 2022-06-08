@@ -11,14 +11,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
-import net.minecraft.network.MessageType;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 import net.minecraft.util.registry.Registry;
 import org.spoorn.starteritems.config.Message;
 import org.spoorn.starteritems.config.ModConfig;
@@ -178,7 +176,7 @@ public class StarterItems implements ModInitializer {
     private void sendMessagesToPlayer(ServerPlayerEntity player, List<Text> firstJoinMessages) {
         if (player != null && !firstJoinMessages.isEmpty()) {
             for (Text message : firstJoinMessages) {
-                player.sendMessage(message, MessageType.CHAT, Util.NIL_UUID);
+                player.sendMessage(message, MessageType.SYSTEM);
             }
         }
     }
@@ -187,7 +185,7 @@ public class StarterItems implements ModInitializer {
         Pattern colorPattern = Pattern.compile("^(#[0-9a-fA-F]{6})|(\\d+$)");
         List<Text> res = new ArrayList<>();
         for (Message s : messages) {
-            MutableText text = new LiteralText(s.text);
+            MutableText text = Text.literal(s.text);
             
             String colorStr = s.color;
             if (colorStr != null) {
