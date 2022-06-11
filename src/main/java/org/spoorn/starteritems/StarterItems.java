@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.item.Item;
@@ -42,6 +43,9 @@ public class StarterItems implements ModInitializer {
     // Keep track of players that have been loaded.  This is to avoid sending the welcome message when player reloads
     // as in changing dimensions.
     public static final Set<String> LOADED_PLAYERS = new HashSet<>();
+    // Used for the 2nd check for clearing inventory in mixin
+    public static final Set<String> NEW_PLAYERS = new HashSet<>();
+    public static List<ItemStack> starterItemStacks = new ArrayList<>();
     
     @Override
     public void onInitialize() {
@@ -88,7 +92,6 @@ public class StarterItems implements ModInitializer {
         
         // On player log in, give starter items
         if (!itemInfos.isEmpty() || !firstJoinMessages.isEmpty()) {
-            List<ItemStack> starterItemStacks = new ArrayList<>();
             AtomicBoolean parsedItems = new AtomicBoolean(false);
 
             ServerEntityEvents.Load loadLambda = ((entity, world) -> {
@@ -127,7 +130,7 @@ public class StarterItems implements ModInitializer {
                         }
 
                         if (!player.addScoreboardTag(JOINED_ID)) {
-                            throw new RuntimeException("Player " + player + " scoreboard tags are full!  Might need to find a different way to track player joined worlds");
+                            throw new RuntimeException("Player " + player + " scoreboard tags are full!  Might need to find a different way to track player joined worlds.  Please submit an issue to https://github.com/spoorn/StarterItems/issues");
                         } else {
                             // send first join messages to player
                             log.info("Sending first join message to player {}", player);
@@ -149,6 +152,10 @@ public class StarterItems implements ModInitializer {
                                     player.dropStack(itemStack);
                                 }
                             }
+                        }
+                        
+                        if (ModConfig.get().clearInventoryBeforeGivingItems) {
+                            NEW_PLAYERS.add(player.getGameProfile().getId().toString());
                         }
                     }
                     
