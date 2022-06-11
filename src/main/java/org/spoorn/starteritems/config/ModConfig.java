@@ -13,7 +13,7 @@ public class ModConfig implements Config {
     
     private static ModConfig CONFIG;
     
-    @Comment("Set to true to clear the player's inventory before adding starter items listed in this config file. [default = false]\n" +
+    @Comment("Set to true to clear the player's inventory of any non-starter items listed in this config upon player login. [default = false]\n" +
             "This is useful for cases where mods in a modpack may actually add their own items to a player's inventory when\n" +
             "\tthey first join a world.  Setting this to true will attempt to load StarterItems's logic AFTER other mods, and\n" +
             "\tclear the inventory before.  There is a chance that other mods try to do the same, in which case, if you notice\n" +
