@@ -36,7 +36,7 @@ public class StarterItems implements ModInitializer {
     
     public static final String MODID = "starteritems";
     public static final String JOINED_ID = MODID + "_joined";
-    private static final Pattern ITEM_REGEX = Pattern.compile("^((?<count>\\d+)\\s+)?\\s*(?<item>[\\w:]+)\\s*(\\s+(?<nbt>\\{.*\\}))?$");
+    private static final Pattern ITEM_REGEX = Pattern.compile("^((?<count>\\d+)\\s+)?\\s*(?<item>\\w+:\\w+)\\s*(\\s+(?<nbt>\\{.*\\}))?$");
     
     // Keep track of players that have been loaded.  This is to avoid sending the welcome message when player reloads
     // as in changing dimensions.
