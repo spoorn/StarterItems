@@ -168,7 +168,7 @@ public class StarterItems implements ModInitializer {
                 for (int i = 0; i < serverStartCommands.size(); i++) {
                     String command = serverStartCommands.get(i);
                     try {
-                        server.getCommandManager().execute(server.getCommandSource(), command);
+                        server.getCommandManager().executeWithPrefix(server.getCommandSource(), command);
                     } catch (Exception e) {
                         log.error(String.format("Startup command [%s] failed to execute", command), e);
                     }
