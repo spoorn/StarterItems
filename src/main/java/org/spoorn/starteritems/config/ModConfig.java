@@ -64,6 +64,18 @@ public class ModConfig implements Config {
             new Message("Welcome back to the Oasis!", "#47f5af")
     );
     
+    @Comment("List of commands to trigger on each server startup.\n" +
+            "Make sure if the command contains Strings, that you escape the quote characters (i.e. \\\")\n" +
+            "For example, this can be used to disable Terralith Traveler's Map for Terralith version v2.2.1a due to\n" +
+            "\ttimeout issues: https://github.com/spoorn/myLoot/issues/22#issuecomment-1193212917\n" +
+            "\nExample:\n" +
+            "\t\"serverStartCommands\": [\n" +
+            "\t\t\"/scoreboard objectives add tr.disable_maps dummy\",\n" +
+            "\t\t\"/scoreboard players set %DISABLE_MAP tr.disable_maps 1\",\n" +
+            "\t\t\"/gamerule playersSleepingPercentage 25\"\n" +
+            "\t]")
+    public List<String> serverStartCommands = new ArrayList<>();
+    
     public static void init() {
         CONFIG = OmegaConfig.register(ModConfig.class);
     }

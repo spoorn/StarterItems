@@ -17,12 +17,7 @@
   //		"5 minecraft:apple",
   //		"20 minecraft:bread"
   //	]
-  "starterItems": [
-    "minecraft:diamond",
-    "minecraft:iron_sword {Damage:10}",
-    "5 minecraft:apple",
-    "20 minecraft:bread"
-  ],
+  "starterItems": [],
   //List of messages to send to players when they join a world for the first time.  Each string in the array will be
   //a separate message sent to the player.
   //This is a list of Message objects which contain a required 'text' string field, and optional formatting fields such as color.
@@ -62,5 +57,21 @@
       "text": "Welcome back to the Oasis!",
       "color": "#47f5af"
     }
+  ],
+  //List of commands to trigger on each server startup.
+  //Make sure if the command contains Strings, that you escape the quote characters (i.e. \")
+  //For example, this can be used to disable Terralith Traveler's Map for Terralith version v2.2.1a due to
+  //	timeout issues: https://github.com/spoorn/myLoot/issues/22#issuecomment-1193212917
+  //
+  //Example:
+  //	"serverStartCommands": [
+  //		"/scoreboard objectives add tr.disable_maps dummy",
+  //		"/scoreboard players set %DISABLE_MAP tr.disable_maps 1",
+  //		"/gamerule playersSleepingPercentage 25"
+  //	]
+  "serverStartCommands": [
+    "/scoreboard objectives add tr.disable_maps dummy",
+    "/scoreboard players set %DISABLE_MAP tr.disable_maps 1",
+    "/gamerule playersSleepingPercentage 25"
   ]
 }
