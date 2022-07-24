@@ -8,6 +8,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -161,6 +162,18 @@ public class StarterItems implements ModInitializer {
                     
                     // Keep track of loaded players
                     LOADED_PLAYERS.add(player.getGameProfile().getId().toString());
+                }
+            });
+
+            ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+                List<String> serverStartCommands = ModConfig.get().serverStartCommands;
+                for (int i = 0; i < serverStartCommands.size(); i++) {
+                    String command = serverStartCommands.get(i);
+                    try {
+                        server.getCommandManager().execute(server.getCommandSource(), command);
+                    } catch (Exception e) {
+                        log.error(String.format("Startup command [%s] failed to execute", command), e);
+                    }
                 }
             });
             
