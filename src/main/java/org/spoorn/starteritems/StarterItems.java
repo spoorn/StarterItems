@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -13,7 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
-import net.minecraft.network.message.MessageType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -196,7 +194,7 @@ public class StarterItems implements ModInitializer {
     private void sendMessagesToPlayer(ServerPlayerEntity player, List<Text> firstJoinMessages) {
         if (player != null && !firstJoinMessages.isEmpty()) {
             for (Text message : firstJoinMessages) {
-                player.sendMessage(message, MessageType.SYSTEM);
+                player.sendMessage(message, false);
             }
         }
     }
