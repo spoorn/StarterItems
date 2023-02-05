@@ -12,12 +12,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.spoorn.starteritems.config.Message;
 import org.spoorn.starteritems.config.ModConfig;
 
@@ -109,12 +109,12 @@ public class StarterItems implements ModInitializer {
                             for (ItemInfo itemInfo : itemInfos) {
                                 Identifier identifier = itemInfo.itemId;
 
-                                if (!Registry.ITEM.containsId(identifier)) {
+                                if (!Registries.ITEM.containsId(identifier)) {
                                     throw new RuntimeException("Starter Item {" + identifier + "} does not exist in the Item registry.  " +
                                             "Are you sure the identifier is correct?");
                                 }
 
-                                Item item = Registry.ITEM.get(identifier);
+                                Item item = Registries.ITEM.get(identifier);
                                 int count = itemInfo.countStr == null ? 1 : Integer.parseInt(itemInfo.countStr.trim());
 
                                 ItemStack itemStack = new ItemStack(item, count);
