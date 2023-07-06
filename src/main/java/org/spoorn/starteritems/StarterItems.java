@@ -93,8 +93,8 @@ public class StarterItems implements ModInitializer {
 
             ServerEntityEvents.Load loadLambda = ((entity, world) -> {
                 if (entity instanceof ServerPlayerEntity player) {
-                    Set<String> scoreboardTags = player.getScoreboardTags();
-                    if (scoreboardTags.contains(JOINED_ID)) {
+                    Set<String> tags = player.getCommandTags();
+                    if (tags.contains(JOINED_ID)) {
                         // Only send the welcome message if this is the first time player is loading in
                         if (!welcomeMessages.isEmpty() && !LOADED_PLAYERS.contains(player.getGameProfile().getId().toString())) {
                             // Welcome messages
@@ -126,7 +126,7 @@ public class StarterItems implements ModInitializer {
                             parsedItems.set(true);
                         }
 
-                        if (!player.addScoreboardTag(JOINED_ID)) {
+                        if (!player.addCommandTag(JOINED_ID)) {
                             throw new RuntimeException("Player " + player + " scoreboard tags are full!  Might need to find a different way to track player joined worlds.  Please submit an issue to https://github.com/spoorn/StarterItems/issues");
                         } else {
                             // send first join messages to player
